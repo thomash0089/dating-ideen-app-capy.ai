@@ -5,22 +5,30 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { X, Heart, Sparkles } from "lucide-react";
-import { DatingIdea } from "./DatingIdeaCard";
-
-interface AddIdeaFormProps {
-  onAddIdea: (idea: Omit<DatingIdea, 'id'>) => void;
-  onClose: () => void;
+interface DatingIdea {
+  title: string;
+  description: string;
+  location: string;
+  url?: string;
+  date_planned?: string;
+  time_planned?: string;
 }
 
-export function AddIdeaForm({ onAddIdea, onClose }: AddIdeaFormProps) {
+interface AddIdeaFormProps {
+  onSubmit: (idea: Omit<DatingIdea, 'id' | 'created_at'>) => Promise<void>;
+  onCancel: () => void;
+}
+
+export function AddIdeaForm({ onSubmit, onCancel }: AddIdeaFormProps) {
   const [formData, setFormData] = useState({
     title: '',
     description: '',
     location: '',
     url: '',
-    date: '',
-    time: ''
+    date_planned: '',
+    time_planned: ''
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -41,19 +49,25 @@ export function AddIdeaForm({ onAddIdea, onClose }: AddIdeaFormProps) {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (validateForm()) {
-      onAddIdea(formData);
-      setFormData({
-        title: '',
-        description: '',
-        location: '',
-        url: '',
-        date: '',
-        time: ''
-      });
-      onClose();
+      setIsSubmitting(true);
+      try {
+        await onSubmit(formData);
+        setFormData({
+          title: '',
+          description: '',
+          location: '',
+          url: '',
+          date_planned: '',
+          time_planned: ''
+        });
+      } catch (error) {
+        // Error handling is done in the parent component
+      } finally {
+        setIsSubmitting(false);
+      }
     }
   };
 
@@ -75,7 +89,7 @@ export function AddIdeaForm({ onAddIdea, onClose }: AddIdeaFormProps) {
           <Button
             variant="ghost"
             size="sm"
-            onClick={onClose}
+            onClick={onCancel}
             className="h-8 w-8 p-0"
           >
             <X className="h-4 w-4" />
@@ -155,8 +169,8 @@ export function AddIdeaForm({ onAddIdea, onClose }: AddIdeaFormProps) {
                 <Input
                   id="date"
                   type="date"
-                  value={formData.date}
-                  onChange={(e) => handleChange('date', e.target.value)}
+                  value={formData.date_planned}
+                  onChange={(e) => handleChange('date_planned', e.target.value)}
                 />
               </div>
 
@@ -167,8 +181,8 @@ export function AddIdeaForm({ onAddIdea, onClose }: AddIdeaFormProps) {
                 <Input
                   id="time"
                   type="time"
-                  value={formData.time}
-                  onChange={(e) => handleChange('time', e.target.value)}
+                  value={formData.time_planned}
+                  onChange={(e) => handleChange('time_planned', e.target.value)}
                 />
               </div>
             </div>
@@ -177,17 +191,19 @@ export function AddIdeaForm({ onAddIdea, onClose }: AddIdeaFormProps) {
               <Button
                 type="button"
                 variant="outline"
-                onClick={onClose}
+                onClick={onCancel}
                 className="flex-1"
+                disabled={isSubmitting}
               >
                 Abbrechen
               </Button>
               <Button
                 type="submit"
                 className="flex-1 bg-gradient-romantic hover:opacity-90 transition-opacity"
+                disabled={isSubmitting}
               >
                 <Heart className="h-4 w-4 mr-2" />
-                Speichern
+                {isSubmitting ? 'Speichern...' : 'Speichern'}
               </Button>
             </div>
           </form>

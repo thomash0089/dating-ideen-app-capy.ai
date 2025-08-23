@@ -1,112 +1,130 @@
-import { useState } from "react";
+import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/hooks/useAuth';
 import { Button } from "@/components/ui/button";
-import { Plus, Heart, Sparkles } from "lucide-react";
-import { DatingIdeaCard, DatingIdea } from "@/components/DatingIdeaCard";
-import { AddIdeaForm } from "@/components/AddIdeaForm";
-import { useToast } from "@/hooks/use-toast";
+import { Heart, Sparkles, ArrowRight } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 
-// Sample data
-const sampleIdeas: DatingIdea[] = [
-  {
-    id: '1',
-    title: 'Romantisches Picknick im Englischen Garten',
-    description: 'Ein entspanntes Picknick mit selbstgemachten Leckereien unter den Bäumen. Perfect für warme Sommertage! 🌳☀️',
-    location: 'Englischer Garten, München',
-    date: '2024-06-15',
-    time: '14:00'
-  },
-  {
-    id: '2',
-    title: 'Sonnenuntergang am Starnberger See',
-    description: 'Den Tag mit einem wunderschönen Sonnenuntergang am See ausklingen lassen. Romantik pur! 🌅💕',
-    location: 'Starnberger See, Bayern',
-    url: 'https://www.starnbergersee.de'
-  },
-  {
-    id: '3',
-    title: 'Kochkurs für Paare',
-    description: 'Gemeinsam ein italienisches 3-Gänge-Menü zubereiten und dabei Spaß haben. Anschließend genießen! 👨‍🍳👩‍🍳',
-    location: 'Kochschule Milano, Berlin',
-    date: '2024-07-20',
-    time: '18:30',
-    url: 'https://kochschule-milano.de'
-  }
-];
+export default function Index() {
+  const { user, loading } = useAuth();
+  const navigate = useNavigate();
 
-const Index = () => {
-  const [ideas, setIdeas] = useState<DatingIdea[]>(sampleIdeas);
-  const [showAddForm, setShowAddForm] = useState(false);
-  const { toast } = useToast();
+  useEffect(() => {
+    // Redirect authenticated users to dashboard
+    if (!loading && user?.email_confirmed_at) {
+      navigate('/dashboard');
+    }
+  }, [user, loading, navigate]);
 
-  const handleAddIdea = (newIdea: Omit<DatingIdea, 'id'>) => {
-    const idea: DatingIdea = {
-      ...newIdea,
-      id: Date.now().toString()
-    };
-    setIdeas(prev => [idea, ...prev]);
-    toast({
-      title: "Dating Idee hinzugefügt! 💕",
-      description: "Deine neue Idee wurde erfolgreich gespeichert.",
-    });
-  };
-
-  return (
-    <div className="min-h-screen bg-gradient-soft">
-      {/* Header */}
-      <div className="bg-gradient-romantic shadow-romantic">
-        <div className="max-w-md mx-auto px-4 py-6">
-          <div className="text-center">
-            <div className="flex items-center justify-center gap-2 mb-2">
-              <Heart className="h-8 w-8 text-white" />
-              <h1 className="text-2xl font-bold text-white">Dating Ideen</h1>
-              <Sparkles className="h-6 w-6 text-white" />
-            </div>
-            <p className="text-white/90 text-sm">
-              Sammle deine schönsten Ideen für romantische Dates
-            </p>
-          </div>
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-rose-50 to-pink-100 flex items-center justify-center">
+        <div className="text-center space-y-4">
+          <Skeleton className="h-12 w-48 mx-auto" />
+          <Skeleton className="h-4 w-32 mx-auto" />
         </div>
       </div>
+    );
+  }
 
-      {/* Content */}
-      <div className="max-w-md mx-auto px-4 py-6">
-        {ideas.length === 0 ? (
-          <div className="text-center py-12">
-            <Heart className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-            <h2 className="text-xl font-semibold mb-2">Noch keine Ideen</h2>
-            <p className="text-muted-foreground mb-6">
-              Füge deine erste Dating Idee hinzu!
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-rose-50 to-pink-100">
+      {/* Hero Section */}
+      <section className="relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-rose-100/50 to-pink-200/30" />
+        <div className="relative max-w-4xl mx-auto px-4 py-16 text-center">
+          <div className="mb-8">
+            <div className="flex items-center justify-center mb-6">
+              <Heart className="h-12 w-12 text-rose-500 mr-3" />
+              <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-rose-500 to-pink-600 bg-clip-text text-transparent">
+                Dating Ideen
+              </h1>
+            </div>
+            <p className="text-xl text-muted-foreground mb-2">
+              Deine romantischen Momente planen 💕
+            </p>
+            <p className="text-muted-foreground max-w-2xl mx-auto">
+              Erstelle, organisiere und verwalte deine perfekten Dating-Ideen. 
+              Von romantischen Picknicks bis zu aufregenden Abenteuern - 
+              plane unvergessliche Momente zu zweit.
             </p>
           </div>
-        ) : (
-          <div className="space-y-4">
-            {ideas.map((idea) => (
-              <DatingIdeaCard key={idea.id} idea={idea} />
-            ))}
+
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
+            <Button
+              size="lg"
+              onClick={() => navigate('/auth')}
+              className="bg-gradient-to-r from-rose-500 to-pink-600 hover:from-rose-600 hover:to-pink-700 text-white shadow-lg hover:shadow-xl transition-all duration-300"
+            >
+              <ArrowRight className="h-5 w-5 mr-2" />
+              Jetzt starten
+            </Button>
+            <Button
+              variant="outline"
+              size="lg"
+              onClick={() => navigate('/auth')}
+              className="border-rose-300 text-rose-700 hover:bg-rose-50"
+            >
+              <Heart className="h-5 w-5 mr-2" />
+              Kostenlos anmelden
+            </Button>
           </div>
-        )}
-      </div>
 
-      {/* Floating Action Button */}
-      <div className="fixed bottom-6 right-6">
-        <Button
-          size="lg"
-          onClick={() => setShowAddForm(true)}
-          className="h-14 w-14 rounded-full bg-gradient-romantic hover:opacity-90 shadow-romantic transition-all duration-300 hover:scale-110"
-        >
-          <Plus className="h-6 w-6" />
-        </Button>
-      </div>
+          {/* Features */}
+          <div className="grid md:grid-cols-3 gap-6 mt-16">
+            <div className="bg-white/60 backdrop-blur-sm rounded-lg p-6 border border-rose-200">
+              <div className="w-12 h-12 bg-rose-100 rounded-lg flex items-center justify-center mb-4 mx-auto">
+                <span className="text-2xl">💝</span>
+              </div>
+              <h3 className="font-semibold text-lg mb-2">Ideen sammeln</h3>
+              <p className="text-muted-foreground text-sm">
+                Sammle und organisiere all deine romantischen Ideen an einem Ort
+              </p>
+            </div>
 
-      {/* Add Form Modal */}
-      {showAddForm && (
-        <AddIdeaForm
-          onAddIdea={handleAddIdea}
-          onClose={() => setShowAddForm(false)}
-        />
-      )}
+            <div className="bg-white/60 backdrop-blur-sm rounded-lg p-6 border border-rose-200">
+              <div className="w-12 h-12 bg-pink-100 rounded-lg flex items-center justify-center mb-4 mx-auto">
+                <span className="text-2xl">📅</span>
+              </div>
+              <h3 className="font-semibold text-lg mb-2">Termine planen</h3>
+              <p className="text-muted-foreground text-sm">
+                Plane Datum und Zeit für deine perfekten Dates
+              </p>
+            </div>
+
+            <div className="bg-white/60 backdrop-blur-sm rounded-lg p-6 border border-rose-200">
+              <div className="w-12 h-12 bg-rose-100 rounded-lg flex items-center justify-center mb-4 mx-auto">
+                <Sparkles className="h-6 w-6 text-rose-500" />
+              </div>
+              <h3 className="font-semibold text-lg mb-2">Unvergesslich machen</h3>
+              <p className="text-muted-foreground text-sm">
+                Teile Links und Details für perfekt geplante romantische Momente
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Call to Action */}
+      <section className="py-16 bg-gradient-to-r from-rose-500 to-pink-600">
+        <div className="max-w-4xl mx-auto px-4 text-center">
+          <h2 className="text-3xl font-bold text-white mb-4">
+            Bereit für unvergessliche Momente? ✨
+          </h2>
+          <p className="text-rose-100 mb-8 max-w-2xl mx-auto">
+            Melde dich kostenlos an und beginne noch heute mit der Planung 
+            deiner perfekten Dating-Erlebnisse.
+          </p>
+          <Button
+            size="lg"
+            onClick={() => navigate('/auth')}
+            className="bg-white text-rose-600 hover:bg-rose-50 shadow-lg hover:shadow-xl transition-all duration-300"
+          >
+            <Heart className="h-5 w-5 mr-2" />
+            Kostenlos registrieren
+          </Button>
+        </div>
+      </section>
     </div>
   );
-};
-
-export default Index;
+}

@@ -1,7 +1,18 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Calendar, Clock, MapPin, ExternalLink } from "lucide-react";
+import { Calendar, Clock, MapPin, ExternalLink, Trash2 } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 export interface DatingIdea {
   id: string;
@@ -9,15 +20,17 @@ export interface DatingIdea {
   description: string;
   location: string;
   url?: string;
-  date?: string;
-  time?: string;
+  date_planned?: string;
+  time_planned?: string;
+  created_at: string;
 }
 
 interface DatingIdeaCardProps {
   idea: DatingIdea;
+  onDelete?: (id: string) => void;
 }
 
-export function DatingIdeaCard({ idea }: DatingIdeaCardProps) {
+export function DatingIdeaCard({ idea, onDelete }: DatingIdeaCardProps) {
   const formatDate = (dateStr: string) => {
     const date = new Date(dateStr);
     return date.toLocaleDateString('de-DE', { 
@@ -45,31 +58,65 @@ export function DatingIdeaCard({ idea }: DatingIdeaCardProps) {
         </div>
 
         <div className="flex flex-wrap gap-2">
-          {idea.date && (
+          {idea.date_planned && (
             <Badge variant="secondary" className="text-xs">
               <Calendar className="h-3 w-3 mr-1" />
-              {formatDate(idea.date)}
+              {formatDate(idea.date_planned)}
             </Badge>
           )}
-          {idea.time && (
+          {idea.time_planned && (
             <Badge variant="secondary" className="text-xs">
               <Clock className="h-3 w-3 mr-1" />
-              {idea.time}
+              {idea.time_planned}
             </Badge>
           )}
         </div>
 
-        {idea.url && (
-          <Button
-            variant="outline"
-            size="sm"
-            className="w-full mt-3"
-            onClick={() => window.open(idea.url, '_blank')}
-          >
-            <ExternalLink className="h-4 w-4 mr-2" />
-            Link öffnen
-          </Button>
-        )}
+        <div className="flex gap-2 mt-3">
+          {idea.url && (
+            <Button
+              variant="outline"
+              size="sm"
+              className="flex-1"
+              onClick={() => window.open(idea.url, '_blank')}
+            >
+              <ExternalLink className="h-4 w-4 mr-2" />
+              Link öffnen
+            </Button>
+          )}
+          
+          {onDelete && (
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Idee löschen?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Möchtest du diese Dating-Idee wirklich löschen? 
+                    Diese Aktion kann nicht rückgängig gemacht werden.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Abbrechen</AlertDialogCancel>
+                  <AlertDialogAction
+                    onClick={() => onDelete(idea.id)}
+                    className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                  >
+                    Löschen
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          )}
+        </div>
       </CardContent>
     </Card>
   );
