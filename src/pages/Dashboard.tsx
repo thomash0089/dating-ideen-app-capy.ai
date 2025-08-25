@@ -4,10 +4,13 @@ import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { DatingIdeaCard } from '@/components/DatingIdeaCard';
 import { AddIdeaForm } from '@/components/AddIdeaForm';
+import { Inspirations } from '@/components/Inspirations';
+import { type Inspiration } from '@/components/InspirationCard';
 import { Plus, LogOut, User } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { toast } from '@/hooks/use-toast';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 interface DatingIdea {
   id: string;
@@ -127,6 +130,40 @@ export default function Dashboard() {
     }
   };
 
+  const handleAddInspirationToMyIdeas = async (inspiration: Inspiration) => {
+    if (!user) return;
+
+    try {
+      const ideaData = {
+        title: inspiration.title,
+        description: inspiration.description,
+        location: inspiration.location,
+        url: inspiration.url || '',
+        user_id: user.id
+      };
+
+      const { data, error } = await supabase
+        .from('datingideen_ideas')
+        .insert(ideaData)
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      setIdeas([data, ...ideas]);
+      toast({
+        title: "Hinzugefügt!",
+        description: "Die Inspiration wurde zu deinen Dating-Ideen hinzugefügt.",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Fehler",
+        description: "Inspiration konnte nicht hinzugefügt werden: " + error.message,
+        variant: "destructive"
+      });
+    }
+  };
+
   const handleLogout = async () => {
     try {
       await signOut();
@@ -203,66 +240,79 @@ export default function Dashboard() {
           </div>
         )}
 
-        {/* Ideas List */}
-        <div className="space-y-4">
-          {loading ? (
-            // Loading skeleton
-            Array.from({ length: 3 }).map((_, i) => (
-              <div key={i} className="p-4 bg-white rounded-lg border border-rose-200">
-                <Skeleton className="h-6 w-3/4 mb-2" />
-                <Skeleton className="h-4 w-full mb-2" />
-                <Skeleton className="h-4 w-2/3" />
-              </div>
-            ))
-          ) : ideas.length === 0 ? (
-            // Empty state
-            <div className="text-center py-12">
-              <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-rose-100 flex items-center justify-center">
-                <span className="text-2xl">💝</span>
-              </div>
-              <h3 className="text-lg font-semibold text-foreground mb-2">
-                Noch keine Dating-Ideen
-              </h3>
-              <p className="text-muted-foreground mb-4">
-                Erstelle deine erste romantische Idee und beginne mit der Planung!
-              </p>
-              <Button
-                onClick={() => setShowForm(true)}
-                className="bg-gradient-to-r from-rose-500 to-pink-600 hover:from-rose-600 hover:to-pink-700"
-              >
-                <Plus className="h-4 w-4 mr-2" />
-                Erste Idee hinzufügen
-              </Button>
-            </div>
-          ) : (
-            // Ideas list
-            <>
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-semibold">
-                  Deine Dating-Ideen ({ideas.length})
-                </h3>
-                {!showForm && (
+        {/* Tabs for Ideas and Inspirations */}
+        <Tabs defaultValue="ideas" className="w-full">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="ideas">Meine Ideen</TabsTrigger>
+            <TabsTrigger value="inspirations">Inspirationen</TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="ideas" className="mt-6">
+            <div className="space-y-4">
+              {loading ? (
+                // Loading skeleton
+                Array.from({ length: 3 }).map((_, i) => (
+                  <div key={i} className="p-4 bg-white rounded-lg border border-rose-200">
+                    <Skeleton className="h-6 w-3/4 mb-2" />
+                    <Skeleton className="h-4 w-full mb-2" />
+                    <Skeleton className="h-4 w-2/3" />
+                  </div>
+                ))
+              ) : ideas.length === 0 ? (
+                // Empty state
+                <div className="text-center py-12">
+                  <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-rose-100 flex items-center justify-center">
+                    <span className="text-2xl">💝</span>
+                  </div>
+                  <h3 className="text-lg font-semibold text-foreground mb-2">
+                    Noch keine Dating-Ideen
+                  </h3>
+                  <p className="text-muted-foreground mb-4">
+                    Erstelle deine erste romantische Idee oder schau dir die Inspirationen an!
+                  </p>
                   <Button
                     onClick={() => setShowForm(true)}
-                    size="sm"
                     className="bg-gradient-to-r from-rose-500 to-pink-600 hover:from-rose-600 hover:to-pink-700"
                   >
                     <Plus className="h-4 w-4 mr-2" />
-                    Neue Idee
+                    Erste Idee hinzufügen
                   </Button>
-                )}
-              </div>
-              
-              {ideas.map((idea) => (
-                <DatingIdeaCard
-                  key={idea.id}
-                  idea={idea}
-                  onDelete={handleDeleteIdea}
-                />
-              ))}
-            </>
-          )}
-        </div>
+                </div>
+              ) : (
+                // Ideas list
+                <>
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-lg font-semibold">
+                      Deine Dating-Ideen ({ideas.length})
+                    </h3>
+                    {!showForm && (
+                      <Button
+                        onClick={() => setShowForm(true)}
+                        size="sm"
+                        className="bg-gradient-to-r from-rose-500 to-pink-600 hover:from-rose-600 hover:to-pink-700"
+                      >
+                        <Plus className="h-4 w-4 mr-2" />
+                        Neue Idee
+                      </Button>
+                    )}
+                  </div>
+                  
+                  {ideas.map((idea) => (
+                    <DatingIdeaCard
+                      key={idea.id}
+                      idea={idea}
+                      onDelete={handleDeleteIdea}
+                    />
+                  ))}
+                </>
+              )}
+            </div>
+          </TabsContent>
+          
+          <TabsContent value="inspirations" className="mt-6">
+            <Inspirations onAddToMyIdeas={handleAddInspirationToMyIdeas} />
+          </TabsContent>
+        </Tabs>
       </main>
 
       {/* Floating Action Button for mobile */}
