@@ -29,6 +29,7 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [userRole, setUserRole] = useState<string>('user');
+  const [editingIdea, setEditingIdea] = useState<DatingIdea | null>(null);
 
   useEffect(() => {
     fetchIdeas();
@@ -81,23 +82,44 @@ export default function Dashboard() {
     if (!user) return;
 
     try {
-      const { data, error } = await supabase
-        .from('datingideen_ideas')
-        .insert({
-          ...ideaData,
-          user_id: user.id
-        })
-        .select()
-        .single();
+      if (editingIdea) {
+        // Update existing idea
+        const { data, error } = await supabase
+          .from('datingideen_ideas')
+          .update(ideaData)
+          .eq('id', editingIdea.id)
+          .select()
+          .single();
 
-      if (error) throw error;
+        if (error) throw error;
 
-      setIdeas([data, ...ideas]);
+        setIdeas(ideas.map(idea => idea.id === editingIdea.id ? data : idea));
+        setEditingIdea(null);
+        toast({
+          title: "Gespeichert!",
+          description: "Deine Dating-Idee wurde aktualisiert.",
+        });
+      } else {
+        // Create new idea
+        const { data, error } = await supabase
+          .from('datingideen_ideas')
+          .insert({
+            ...ideaData,
+            user_id: user.id
+          })
+          .select()
+          .single();
+
+        if (error) throw error;
+
+        setIdeas([data, ...ideas]);
+        toast({
+          title: "Erfolg!",
+          description: "Deine Dating-Idee wurde gespeichert.",
+        });
+      }
+      
       setShowForm(false);
-      toast({
-        title: "Erfolg!",
-        description: "Deine Dating-Idee wurde gespeichert.",
-      });
     } catch (error: any) {
       toast({
         title: "Fehler",
@@ -162,6 +184,16 @@ export default function Dashboard() {
         variant: "destructive"
       });
     }
+  };
+
+  const handleEditIdea = (idea: DatingIdea) => {
+    setEditingIdea(idea);
+    setShowForm(true);
+  };
+
+  const handleCancelEdit = () => {
+    setEditingIdea(null);
+    setShowForm(false);
   };
 
   const handleLogout = async () => {
@@ -242,12 +274,14 @@ export default function Dashboard() {
           </p>
         </div>
 
-        {/* Add Idea Form */}
+        {/* Add/Edit Idea Form */}
         {showForm && (
           <div className="mb-6">
             <AddIdeaForm
               onSubmit={handleAddIdea}
-              onCancel={() => setShowForm(false)}
+              onCancel={handleCancelEdit}
+              editingIdea={editingIdea}
+              isEditing={!!editingIdea}
             />
           </div>
         )}
@@ -314,6 +348,7 @@ export default function Dashboard() {
                       key={idea.id}
                       idea={idea}
                       onDelete={handleDeleteIdea}
+                      onEdit={handleEditIdea}
                     />
                   ))}
                 </>

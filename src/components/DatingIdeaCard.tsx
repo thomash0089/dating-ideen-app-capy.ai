@@ -1,7 +1,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Calendar, Clock, MapPin, ExternalLink, Trash2 } from "lucide-react";
+import { Calendar, Clock, MapPin, ExternalLink, Trash2, Edit } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -28,9 +28,10 @@ export interface DatingIdea {
 interface DatingIdeaCardProps {
   idea: DatingIdea;
   onDelete?: (id: string) => void;
+  onEdit?: (idea: DatingIdea) => void;
 }
 
-export function DatingIdeaCard({ idea, onDelete }: DatingIdeaCardProps) {
+export function DatingIdeaCard({ idea, onDelete, onEdit }: DatingIdeaCardProps) {
   const formatDate = (dateStr: string) => {
     const date = new Date(dateStr);
     return date.toLocaleDateString('de-DE', { 
@@ -82,6 +83,17 @@ export function DatingIdeaCard({ idea, onDelete }: DatingIdeaCardProps) {
             >
               <ExternalLink className="h-4 w-4 mr-2" />
               Link öffnen
+            </Button>
+          )}
+          
+          {onEdit && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => onEdit(idea)}
+              className="text-primary hover:text-primary hover:bg-primary/10"
+            >
+              <Edit className="h-4 w-4" />
             </Button>
           )}
           

@@ -18,16 +18,18 @@ interface DatingIdea {
 interface AddIdeaFormProps {
   onSubmit: (idea: Omit<DatingIdea, 'id' | 'created_at'>) => Promise<void>;
   onCancel: () => void;
+  editingIdea?: DatingIdea & { id: string; created_at: string };
+  isEditing?: boolean;
 }
 
-export function AddIdeaForm({ onSubmit, onCancel }: AddIdeaFormProps) {
+export function AddIdeaForm({ onSubmit, onCancel, editingIdea, isEditing = false }: AddIdeaFormProps) {
   const [formData, setFormData] = useState({
-    title: '',
-    description: '',
-    location: '',
-    url: '',
-    date_planned: '',
-    time_planned: ''
+    title: editingIdea?.title || '',
+    description: editingIdea?.description || '',
+    location: editingIdea?.location || '',
+    url: editingIdea?.url || '',
+    date_planned: editingIdea?.date_planned || '',
+    time_planned: editingIdea?.time_planned || ''
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -92,7 +94,7 @@ export function AddIdeaForm({ onSubmit, onCancel }: AddIdeaFormProps) {
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
           <CardTitle className="text-xl font-bold bg-gradient-romantic bg-clip-text text-transparent">
             <Heart className="inline h-5 w-5 mr-2 text-primary" />
-            Neue Dating Idee
+            {isEditing ? 'Dating Idee bearbeiten' : 'Neue Dating Idee'}
           </CardTitle>
           <Button
             variant="ghost"
@@ -210,7 +212,7 @@ export function AddIdeaForm({ onSubmit, onCancel }: AddIdeaFormProps) {
                 disabled={isSubmitting}
               >
                 <Heart className="h-4 w-4 mr-2" />
-                {isSubmitting ? 'Speichern...' : 'Speichern'}
+                {isSubmitting ? 'Speichern...' : (isEditing ? 'Änderungen speichern' : 'Speichern')}
               </Button>
             </div>
           </form>
