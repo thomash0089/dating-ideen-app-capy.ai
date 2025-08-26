@@ -12,6 +12,7 @@ import { toast } from '@/hooks/use-toast';
 import { Trash2, Plus, Settings, Upload, Download, LogOut, User } from 'lucide-react';
 import { Link, Navigate } from 'react-router-dom';
 import { Skeleton } from '@/components/ui/skeleton';
+import { DurationSelector } from '@/components/DurationSelector';
 
 interface Inspiration {
   id: string;
@@ -45,7 +46,7 @@ export default function AdminDashboard() {
     category: 'general',
     difficulty_level: 'easy',
     estimated_cost: 'low',
-    duration: '2-3 hours',
+    duration: '2 Stunden',
     season: 'all'
   });
 
@@ -141,7 +142,7 @@ export default function AdminDashboard() {
       category: 'general',
       difficulty_level: 'easy',
       estimated_cost: 'low',
-      duration: '2-3 hours',
+      duration: '2 Stunden',
       season: 'all'
     });
     setShowAddForm(false);
@@ -157,7 +158,7 @@ export default function AdminDashboard() {
       category: inspiration.category || 'general',
       difficulty_level: inspiration.difficulty_level || 'easy',
       estimated_cost: inspiration.estimated_cost || 'low',
-      duration: inspiration.duration || '2-3 hours',
+      duration: inspiration.duration || '2 Stunden',
       season: inspiration.season || 'all'
     });
     setEditingInspiration(inspiration);
@@ -421,21 +422,10 @@ export default function AdminDashboard() {
                           </Select>
                         </div>
                         
-                        <div>
-                          <label className="block text-sm font-medium mb-1">Dauer</label>
-                          <Select value={formData.duration} onValueChange={(value) => setFormData({ ...formData, duration: value })}>
-                            <SelectTrigger>
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="1 hour">1 Stunde</SelectItem>
-                              <SelectItem value="2-3 hours">2-3 Stunden</SelectItem>
-                              <SelectItem value="half day">Halber Tag</SelectItem>
-                              <SelectItem value="full day">Ganzer Tag</SelectItem>
-                              <SelectItem value="weekend">Wochenende</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
+                        <DurationSelector
+                          value={formData.duration}
+                          onChange={(value) => setFormData({ ...formData, duration: value })}
+                        />
                         
                         <div>
                           <label className="block text-sm font-medium mb-1">Saison</label>
