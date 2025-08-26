@@ -5,13 +5,14 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { X, Heart, Sparkles } from "lucide-react";
+
 interface DatingIdea {
   title: string;
   description: string;
   location: string;
   url?: string;
-  date_planned?: string;
-  time_planned?: string;
+  date_planned?: string | null;
+  time_planned?: string | null;
 }
 
 interface AddIdeaFormProps {
@@ -34,7 +35,6 @@ export function AddIdeaForm({ onSubmit, onCancel }: AddIdeaFormProps) {
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
-    
     if (!formData.title.trim()) {
       newErrors.title = 'Titel ist erforderlich';
     }
@@ -44,7 +44,6 @@ export function AddIdeaForm({ onSubmit, onCancel }: AddIdeaFormProps) {
     if (!formData.location.trim()) {
       newErrors.location = 'Ort ist erforderlich';
     }
-
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -54,7 +53,16 @@ export function AddIdeaForm({ onSubmit, onCancel }: AddIdeaFormProps) {
     if (validateForm()) {
       setIsSubmitting(true);
       try {
-        await onSubmit(formData);
+        // Leere Strings in NULL konvertieren, damit Postgres keinen Fehler wirft
+        const cleanedData = {
+          ...formData,
+          url: formData.url.trim() || null,
+          date_planned: formData.date_planned || null,
+          time_planned: formData.time_planned || null,
+        };
+
+        await onSubmit(cleanedData);
+
         setFormData({
           title: '',
           description: '',
@@ -95,7 +103,6 @@ export function AddIdeaForm({ onSubmit, onCancel }: AddIdeaFormProps) {
             <X className="h-4 w-4" />
           </Button>
         </CardHeader>
-        
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
@@ -116,7 +123,7 @@ export function AddIdeaForm({ onSubmit, onCancel }: AddIdeaFormProps) {
 
             <div className="space-y-2">
               <Label htmlFor="description" className="text-sm font-medium">
-                Beschreibung * 
+                Beschreibung *
                 <Sparkles className="inline h-3 w-3 ml-1 text-primary" />
               </Label>
               <Textarea
