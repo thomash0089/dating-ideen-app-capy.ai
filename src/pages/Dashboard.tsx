@@ -6,7 +6,7 @@ import { DatingIdeaCard } from '@/components/DatingIdeaCard';
 import { AddIdeaForm } from '@/components/AddIdeaForm';
 import { Inspirations } from '@/components/Inspirations';
 import { type Inspiration } from '@/components/InspirationCard';
-import { Plus, LogOut, User } from 'lucide-react';
+import { Plus, LogOut, User, Settings } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { toast } from '@/hooks/use-toast';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -196,6 +196,18 @@ export default function Dashboard() {
               <User className="h-4 w-4" />
               <span>{userRole === 'admin' ? 'Admin' : 'User'}</span>
             </div>
+            {userRole === 'admin' && (
+              <Link to="/admin">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-muted-foreground hover:text-foreground"
+                >
+                  <Settings className="h-4 w-4 mr-1" />
+                  Admin
+                </Button>
+              </Link>
+            )}
             <Link to="/profile">
               <Button
                 variant="ghost"

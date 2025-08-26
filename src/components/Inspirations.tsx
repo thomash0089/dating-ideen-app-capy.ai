@@ -20,11 +20,14 @@ export function Inspirations({ onAddToMyIdeas }: InspirationsProps) {
   const fetchInspirations = async () => {
     try {
       setLoading(true);
-      // Use rpc or raw query since table not in types yet
-      const { data, error } = await supabase.rpc('get_inspirations');
+      const { data, error } = await supabase
+        .from('datingideen_inspirations' as any)
+        .select('*')
+        .eq('is_active', true)
+        .order('created_at', { ascending: false });
 
       if (error) throw error;
-      setInspirations(data || []);
+      setInspirations((data as unknown as Inspiration[]) || []);
     } catch (error: any) {
       toast({
         title: "Fehler",
