@@ -19,6 +19,7 @@ export type Database = {
           created_at: string
           date_planned: string | null
           description: string
+          general_location_info: string | null
           id: string
           location: string
           time_planned: string | null
@@ -31,6 +32,7 @@ export type Database = {
           created_at?: string
           date_planned?: string | null
           description: string
+          general_location_info?: string | null
           id?: string
           location: string
           time_planned?: string | null
@@ -43,6 +45,7 @@ export type Database = {
           created_at?: string
           date_planned?: string | null
           description?: string
+          general_location_info?: string | null
           id?: string
           location?: string
           time_planned?: string | null
@@ -53,29 +56,139 @@ export type Database = {
         }
         Relationships: []
       }
+      datingideen_inspirations: {
+        Row: {
+          category: string | null
+          created_at: string
+          description: string
+          difficulty_level: string | null
+          duration: string | null
+          estimated_cost: string | null
+          id: string
+          is_active: boolean | null
+          location: string
+          season: string | null
+          title: string
+          updated_at: string
+          url: string | null
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string
+          description: string
+          difficulty_level?: string | null
+          duration?: string | null
+          estimated_cost?: string | null
+          id?: string
+          is_active?: boolean | null
+          location: string
+          season?: string | null
+          title: string
+          updated_at?: string
+          url?: string | null
+        }
+        Update: {
+          category?: string | null
+          created_at?: string
+          description?: string
+          difficulty_level?: string | null
+          duration?: string | null
+          estimated_cost?: string | null
+          id?: string
+          is_active?: boolean | null
+          location?: string
+          season?: string | null
+          title?: string
+          updated_at?: string
+          url?: string | null
+        }
+        Relationships: []
+      }
       datingideen_profiles: {
         Row: {
+          bio: string | null
+          birth_date: string | null
+          city: string | null
           created_at: string
+          distance_radius: number | null
           email: string
+          gender: Database["public"]["Enums"]["datingideen_gender"] | null
+          gender_search:
+            | Database["public"]["Enums"]["datingideen_gender_search"]
+            | null
           id: string
+          interests: string[] | null
+          latitude: number | null
+          longitude: number | null
+          name: string | null
+          partner_user_id: string | null
+          postal_code: string | null
+          profile_photo_url: string | null
+          relationship_status:
+            | Database["public"]["Enums"]["datingideen_relationship_status"]
+            | null
           updated_at: string
           user_id: string
         }
         Insert: {
+          bio?: string | null
+          birth_date?: string | null
+          city?: string | null
           created_at?: string
+          distance_radius?: number | null
           email: string
+          gender?: Database["public"]["Enums"]["datingideen_gender"] | null
+          gender_search?:
+            | Database["public"]["Enums"]["datingideen_gender_search"]
+            | null
           id?: string
+          interests?: string[] | null
+          latitude?: number | null
+          longitude?: number | null
+          name?: string | null
+          partner_user_id?: string | null
+          postal_code?: string | null
+          profile_photo_url?: string | null
+          relationship_status?:
+            | Database["public"]["Enums"]["datingideen_relationship_status"]
+            | null
           updated_at?: string
           user_id: string
         }
         Update: {
+          bio?: string | null
+          birth_date?: string | null
+          city?: string | null
           created_at?: string
+          distance_radius?: number | null
           email?: string
+          gender?: Database["public"]["Enums"]["datingideen_gender"] | null
+          gender_search?:
+            | Database["public"]["Enums"]["datingideen_gender_search"]
+            | null
           id?: string
+          interests?: string[] | null
+          latitude?: number | null
+          longitude?: number | null
+          name?: string | null
+          partner_user_id?: string | null
+          postal_code?: string | null
+          profile_photo_url?: string | null
+          relationship_status?:
+            | Database["public"]["Enums"]["datingideen_relationship_status"]
+            | null
           updated_at?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "datingideen_profiles_partner_user_id_fkey"
+            columns: ["partner_user_id"]
+            isOneToOne: false
+            referencedRelation: "datingideen_profiles"
+            referencedColumns: ["user_id"]
+          },
+        ]
       }
       datingideen_user_roles: {
         Row: {
@@ -113,6 +226,9 @@ export type Database = {
     }
     Enums: {
       datingideen_app_role: "user" | "admin"
+      datingideen_gender: "male" | "female" | "other"
+      datingideen_gender_search: "male" | "female" | "both"
+      datingideen_relationship_status: "single" | "in_partnership"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -241,6 +357,9 @@ export const Constants = {
   public: {
     Enums: {
       datingideen_app_role: ["user", "admin"],
+      datingideen_gender: ["male", "female", "other"],
+      datingideen_gender_search: ["male", "female", "both"],
+      datingideen_relationship_status: ["single", "in_partnership"],
     },
   },
 } as const

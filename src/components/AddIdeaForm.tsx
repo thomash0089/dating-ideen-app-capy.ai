@@ -9,6 +9,7 @@ import { X, Heart, Sparkles } from "lucide-react";
 interface DatingIdea {
   title: string;
   description: string;
+  general_location_info?: string;
   location: string;
   url?: string;
   date_planned?: string | null;
@@ -18,7 +19,7 @@ interface DatingIdea {
 interface AddIdeaFormProps {
   onSubmit: (idea: Omit<DatingIdea, 'id' | 'created_at'>) => Promise<void>;
   onCancel: () => void;
-  editingIdea?: DatingIdea & { id: string; created_at: string };
+  editingIdea?: DatingIdea & { id: string; created_at: string; general_location_info?: string };
   isEditing?: boolean;
 }
 
@@ -26,6 +27,7 @@ export function AddIdeaForm({ onSubmit, onCancel, editingIdea, isEditing = false
   const [formData, setFormData] = useState({
     title: editingIdea?.title || '',
     description: editingIdea?.description || '',
+    general_location_info: editingIdea?.general_location_info || '',
     location: editingIdea?.location || '',
     url: editingIdea?.url || '',
     date_planned: editingIdea?.date_planned || '',
@@ -59,6 +61,7 @@ export function AddIdeaForm({ onSubmit, onCancel, editingIdea, isEditing = false
         const cleanedData = {
           ...formData,
           url: formData.url.trim() || null,
+          general_location_info: formData.general_location_info.trim() || null,
           date_planned: formData.date_planned || null,
           time_planned: formData.time_planned || null,
         };
@@ -68,6 +71,7 @@ export function AddIdeaForm({ onSubmit, onCancel, editingIdea, isEditing = false
         setFormData({
           title: '',
           description: '',
+          general_location_info: '',
           location: '',
           url: '',
           date_planned: '',
@@ -139,6 +143,18 @@ export function AddIdeaForm({ onSubmit, onCancel, editingIdea, isEditing = false
               {errors.description && (
                 <p className="text-xs text-destructive">{errors.description}</p>
               )}
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="general_location_info" className="text-sm font-medium">
+                Wo? Allgemeine Info
+              </Label>
+              <Input
+                id="general_location_info"
+                value={formData.general_location_info}
+                onChange={(e) => handleChange('general_location_info', e.target.value)}
+                placeholder="Park, Café, Bar"
+              />
             </div>
 
             <div className="space-y-2">
