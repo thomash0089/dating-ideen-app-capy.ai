@@ -5,6 +5,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { X, Heart, Sparkles } from "lucide-react";
+import { DurationSelector } from "@/components/DurationSelector";
 
 interface DatingIdea {
   title: string;
@@ -12,6 +13,7 @@ interface DatingIdea {
   general_location_info?: string;
   location: string;
   url?: string;
+  duration?: string;
   date_planned?: string | null;
   time_planned?: string | null;
 }
@@ -19,7 +21,7 @@ interface DatingIdea {
 interface AddIdeaFormProps {
   onSubmit: (idea: Omit<DatingIdea, 'id' | 'created_at'>) => Promise<void>;
   onCancel: () => void;
-  editingIdea?: DatingIdea & { id: string; created_at: string; general_location_info?: string };
+  editingIdea?: DatingIdea & { id: string; created_at: string; general_location_info?: string; duration?: string };
   isEditing?: boolean;
 }
 
@@ -30,6 +32,7 @@ export function AddIdeaForm({ onSubmit, onCancel, editingIdea, isEditing = false
     general_location_info: editingIdea?.general_location_info || '',
     location: editingIdea?.location || '',
     url: editingIdea?.url || '',
+    duration: editingIdea?.duration || '2 Stunden',
     date_planned: editingIdea?.date_planned || '',
     time_planned: editingIdea?.time_planned || ''
   });
@@ -74,6 +77,7 @@ export function AddIdeaForm({ onSubmit, onCancel, editingIdea, isEditing = false
           general_location_info: '',
           location: '',
           url: '',
+          duration: '2 Stunden',
           date_planned: '',
           time_planned: ''
         });
@@ -185,6 +189,11 @@ export function AddIdeaForm({ onSubmit, onCancel, editingIdea, isEditing = false
                 placeholder="https://..."
               />
             </div>
+
+            <DurationSelector
+              value={formData.duration}
+              onChange={(value) => handleChange('duration', value)}
+            />
 
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-2">

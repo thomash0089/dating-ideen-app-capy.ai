@@ -1,8 +1,7 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
-import { Clock } from 'lucide-react';
+import { ChevronDown } from 'lucide-react';
 
 interface DurationSelectorProps {
   value: string;
@@ -11,106 +10,111 @@ interface DurationSelectorProps {
 }
 
 export function DurationSelector({ value, onChange, className }: DurationSelectorProps) {
-  const [isCustom, setIsCustom] = useState(() => {
-    // Check if current value is not one of the predefined options
-    const predefinedOptions = ['1 hour', '2-3 hours', 'full day', 'weekend'];
-    return !predefinedOptions.includes(value) || value === '';
+  const [isOpen, setIsOpen] = useState(false);
+  const [inputValue, setInputValue] = useState(() => {
+    // Extract numeric value from current value for display
+    const match = value.match(/(\d+)/);
+    return match ? match[1] : '2';
   });
   
-  const [customHours, setCustomHours] = useState(() => {
-    // Extract number from custom values like "4 Stunden" or "5 hours"
-    const match = value.match(/(\d+)\s*(Stunden?|hours?)/i);
-    return match ? match[1] : '';
-  });
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const predefinedOptions = [
-    { value: '1 hour', label: '1 Stunde' },
-    { value: '2-3 hours', label: '2-3 Stunden' },
-    { value: 'full day', label: 'Ganzer Tag' },
-    { value: 'weekend', label: 'Wochenende' }
+    '2-3 Stunden',
+    '3-5 Stunden', 
+    'Ganzer Tag',
+    'Wochenende'
   ];
 
-  const handleCustomHoursChange = (hours: string) => {
-    setCustomHours(hours);
+  // Handle clicks outside dropdown to close it
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+    
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const hours = e.target.value;
+    setInputValue(hours);
+    
     if (hours && parseInt(hours) > 0) {
       const hourValue = parseInt(hours);
       const label = hourValue === 1 ? 'Stunde' : 'Stunden';
       onChange(`${hourValue} ${label}`);
     } else {
-      onChange('');
+      onChange('2 Stunden'); // Default fallback
     }
   };
 
-  const handlePredefinedChange = (selectedValue: string) => {
-    onChange(selectedValue);
-    setIsCustom(false);
+  const handleOptionSelect = (option: string) => {
+    onChange(option);
+    setIsOpen(false);
+    
+    // Update input value based on selected option
+    const match = option.match(/(\d+)/);
+    if (match) {
+      setInputValue(match[1]);
+    } else {
+      // For non-numeric options, keep current input or default to 2
+      setInputValue(inputValue || '2');
+    }
   };
 
-  const switchToCustom = () => {
-    setIsCustom(true);
-    setCustomHours('2');
-    onChange('2 Stunden');
-  };
-
-  const switchToPredefined = () => {
-    setIsCustom(false);
-    onChange('2-3 hours');
-    setCustomHours('');
+  const toggleDropdown = () => {
+    setIsOpen(!isOpen);
   };
 
   return (
     <div className={className}>
       <label className="block text-sm font-medium mb-2">Dauer</label>
       
-      <div className="space-y-2">
-        <div className="flex gap-2">
-          <Button
-            type="button"
-            variant={isCustom ? "default" : "outline"}
-            size="sm"
-            onClick={switchToCustom}
-            className="flex-1"
-          >
-            <Clock className="h-3 w-3 mr-1" />
-            Eigene Eingabe
-          </Button>
-          <Button
-            type="button"
-            variant={!isCustom ? "default" : "outline"}
-            size="sm"
-            onClick={switchToPredefined}
-            className="flex-1"
-          >
-            Vordefiniert
-          </Button>
-        </div>
-
-        {isCustom ? (
-          <div className="flex items-center gap-2">
-            <Input
-              type="number"
-              min="1"
-              max="24"
-              value={customHours}
-              onChange={(e) => handleCustomHoursChange(e.target.value)}
-              placeholder="Anzahl"
-              className="w-24"
-            />
-            <span className="text-sm text-muted-foreground">Stunden</span>
+      <div className="relative" ref={dropdownRef}>
+        <div className="flex items-center">
+          <Input
+            ref={inputRef}
+            type="number"
+            min="1"
+            max="24"
+            value={inputValue}
+            onChange={handleInputChange}
+            placeholder="2"
+            className="pr-20"
+          />
+          <div className="absolute right-0 flex items-center">
+            <span className="text-sm text-muted-foreground mr-2">Std.</span>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={toggleDropdown}
+              className="h-8 px-2"
+            >
+              <ChevronDown className="h-3 w-3" />
+            </Button>
           </div>
-        ) : (
-          <Select value={value} onValueChange={handlePredefinedChange}>
-            <SelectTrigger>
-              <SelectValue placeholder="Dauer wählen" />
-            </SelectTrigger>
-            <SelectContent>
+        </div>
+        
+        {isOpen && (
+          <div className="absolute top-full left-0 right-0 mt-1 bg-popover border rounded-md shadow-md z-50">
+            <div className="py-1">
               {predefinedOptions.map((option) => (
-                <SelectItem key={option.value} value={option.value}>
-                  {option.label}
-                </SelectItem>
+                <button
+                  key={option}
+                  type="button"
+                  className="w-full text-left px-3 py-2 text-sm hover:bg-accent hover:text-accent-foreground transition-colors"
+                  onClick={() => handleOptionSelect(option)}
+                >
+                  {option}
+                </button>
               ))}
-            </SelectContent>
-          </Select>
+            </div>
+          </div>
         )}
       </div>
     </div>

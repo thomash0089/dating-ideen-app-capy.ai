@@ -19,6 +19,7 @@ export type Database = {
           created_at: string
           date_planned: string | null
           description: string
+          duration: string | null
           general_location_info: string | null
           id: string
           location: string
@@ -32,6 +33,7 @@ export type Database = {
           created_at?: string
           date_planned?: string | null
           description: string
+          duration?: string | null
           general_location_info?: string | null
           id?: string
           location: string
@@ -45,6 +47,7 @@ export type Database = {
           created_at?: string
           date_planned?: string | null
           description?: string
+          duration?: string | null
           general_location_info?: string | null
           id?: string
           location?: string

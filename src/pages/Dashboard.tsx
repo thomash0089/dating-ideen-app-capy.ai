@@ -16,8 +16,10 @@ interface DatingIdea {
   id: string;
   title: string;
   description: string;
+  general_location_info?: string;
   location: string;
   url?: string;
+  duration?: string;
   date_planned?: string;
   time_planned?: string;
   created_at: string;
