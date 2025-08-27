@@ -18,6 +18,7 @@ interface Inspiration {
   id: string;
   title: string;
   description: string;
+  general_location_info?: string;
   location: string;
   url?: string;
   category?: string;
@@ -41,6 +42,7 @@ export default function AdminDashboard() {
   const [formData, setFormData] = useState({
     title: '',
     description: '',
+    general_location_info: '',
     location: '',
     url: '',
     category: 'general',
@@ -137,6 +139,7 @@ export default function AdminDashboard() {
     setFormData({
       title: '',
       description: '',
+      general_location_info: '',
       location: '',
       url: '',
       category: 'general',
@@ -153,6 +156,7 @@ export default function AdminDashboard() {
     setFormData({
       title: inspiration.title,
       description: inspiration.description,
+      general_location_info: inspiration.general_location_info || '',
       location: inspiration.location,
       url: inspiration.url || '',
       category: inspiration.category || 'general',
@@ -365,6 +369,15 @@ export default function AdminDashboard() {
                           onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                           rows={3}
                           required
+                        />
+                      </div>
+                      
+                      <div>
+                        <label className="block text-sm font-medium mb-1">Wo? Allgemeine Info</label>
+                        <Input
+                          value={formData.general_location_info}
+                          onChange={(e) => setFormData({ ...formData, general_location_info: e.target.value })}
+                          placeholder="Park, Café, Bar"
                         />
                       </div>
                       

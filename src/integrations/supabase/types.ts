@@ -64,6 +64,7 @@ export type Database = {
           difficulty_level: string | null
           duration: string | null
           estimated_cost: string | null
+          general_location_info: string | null
           id: string
           is_active: boolean | null
           location: string
@@ -79,6 +80,7 @@ export type Database = {
           difficulty_level?: string | null
           duration?: string | null
           estimated_cost?: string | null
+          general_location_info?: string | null
           id?: string
           is_active?: boolean | null
           location: string
@@ -94,6 +96,7 @@ export type Database = {
           difficulty_level?: string | null
           duration?: string | null
           estimated_cost?: string | null
+          general_location_info?: string | null
           id?: string
           is_active?: boolean | null
           location?: string
