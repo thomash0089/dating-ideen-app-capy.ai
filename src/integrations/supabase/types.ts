@@ -222,6 +222,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      calculate_distance: {
+        Args: { lat1: number; lat2: number; lng1: number; lng2: number }
+        Returns: number
+      }
       datingideen_has_role: {
         Args: {
           _role: Database["public"]["Enums"]["datingideen_app_role"]
