@@ -22,6 +22,8 @@ interface DatingIdea {
   duration?: string;
   date_planned?: string;
   time_planned?: string;
+  latitude?: number | null;
+  longitude?: number | null;
   created_at: string;
 }
 

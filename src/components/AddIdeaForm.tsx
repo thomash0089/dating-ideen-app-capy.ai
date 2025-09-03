@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -6,6 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { X, Heart, Sparkles } from "lucide-react";
 import { DurationSelector } from "@/components/DurationSelector";
+import { supabase } from "@/integrations/supabase/client";
 
 interface DatingIdea {
   title: string;
@@ -16,6 +17,15 @@ interface DatingIdea {
   duration?: string;
   date_planned?: string | null;
   time_planned?: string | null;
+  latitude?: number | null;
+  longitude?: number | null;
+}
+
+interface GeocodeResult {
+  lat: number;
+  lon: number;
+  display_name: string;
+  country_code?: string;
 }
 
 interface AddIdeaFormProps {
@@ -34,9 +44,14 @@ export function AddIdeaForm({ onSubmit, onCancel, editingIdea, isEditing = false
     url: editingIdea?.url || '',
     duration: editingIdea?.duration || '2 Stunden',
     date_planned: editingIdea?.date_planned || '',
-    time_planned: editingIdea?.time_planned || ''
+    time_planned: editingIdea?.time_planned || '',
+    latitude: null as number | null,
+    longitude: null as number | null,
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [searchResults, setSearchResults] = useState<GeocodeResult[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
+  const searchTimeoutRef = useRef<NodeJS.Timeout>();
 
   const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -48,12 +63,67 @@ export function AddIdeaForm({ onSubmit, onCancel, editingIdea, isEditing = false
     if (!formData.description.trim()) {
       newErrors.description = 'Beschreibung ist erforderlich';
     }
-    if (!formData.location.trim()) {
-      newErrors.location = 'Ort ist erforderlich';
-    }
+    // Location is now optional with ** marking
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
+
+  const searchLocation = async (query: string) => {
+    if (!query.trim()) {
+      setSearchResults([]);
+      return;
+    }
+
+    setIsSearching(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('geocode', {
+        body: { query }
+      });
+
+      if (error) {
+        console.error('Geocoding error:', error);
+        setSearchResults([]);
+        return;
+      }
+
+      setSearchResults(data.results || []);
+    } catch (error) {
+      console.error('Search error:', error);
+      setSearchResults([]);
+    } finally {
+      setIsSearching(false);
+    }
+  };
+
+  const handleLocationSelect = (result: GeocodeResult) => {
+    setFormData(prev => ({
+      ...prev,
+      location: result.display_name,
+      latitude: result.lat,
+      longitude: result.lon
+    }));
+    setSearchResults([]);
+  };
+
+  useEffect(() => {
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current);
+    }
+
+    if (formData.location.trim()) {
+      searchTimeoutRef.current = setTimeout(() => {
+        searchLocation(formData.location);
+      }, 300);
+    } else {
+      setSearchResults([]);
+    }
+
+    return () => {
+      if (searchTimeoutRef.current) {
+        clearTimeout(searchTimeoutRef.current);
+      }
+    };
+  }, [formData.location]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -79,7 +149,9 @@ export function AddIdeaForm({ onSubmit, onCancel, editingIdea, isEditing = false
           url: '',
           duration: '2 Stunden',
           date_planned: '',
-          time_planned: ''
+          time_planned: '',
+          latitude: null,
+          longitude: null,
         });
       } catch (error) {
         // Error handling is done in the parent component
@@ -163,15 +235,30 @@ export function AddIdeaForm({ onSubmit, onCancel, editingIdea, isEditing = false
 
             <div className="space-y-2">
               <Label htmlFor="location" className="text-sm font-medium">
-                Ort/Stadt/Adresse *
+                Ort/Stadt/Adresse **
               </Label>
-              <Input
-                id="location"
-                value={formData.location}
-                onChange={(e) => handleChange('location', e.target.value)}
-                placeholder="z.B. Englischer Garten, München"
-                className={errors.location ? 'border-destructive' : ''}
-              />
+              <div className="relative">
+                <Input
+                  id="location"
+                  value={formData.location}
+                  onChange={(e) => handleChange('location', e.target.value)}
+                  placeholder="z.B. Englischer Garten, München"
+                  className={errors.location ? 'border-destructive' : ''}
+                />
+                {searchResults.length > 0 && (
+                  <div className="absolute top-full left-0 right-0 bg-background border border-border rounded-md shadow-lg z-50 max-h-40 overflow-y-auto">
+                    {searchResults.map((result, index) => (
+                      <div
+                        key={index}
+                        className="p-2 hover:bg-muted cursor-pointer text-sm"
+                        onClick={() => handleLocationSelect(result)}
+                      >
+                        {result.display_name}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
               {errors.location && (
                 <p className="text-xs text-destructive">{errors.location}</p>
               )}
