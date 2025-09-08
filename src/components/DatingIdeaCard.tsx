@@ -1,7 +1,9 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Calendar, Clock, MapPin, ExternalLink, Trash2, Edit } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
+import { Calendar, Clock, MapPin, ExternalLink, Trash2, Edit, Globe } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -23,15 +25,19 @@ export interface DatingIdea {
   date_planned?: string;
   time_planned?: string;
   created_at: string;
+  is_public?: boolean;
+  latitude?: number;
+  longitude?: number;
 }
 
 interface DatingIdeaCardProps {
   idea: DatingIdea;
   onDelete?: (id: string) => void;
   onEdit?: (idea: DatingIdea) => void;
+  onTogglePublic?: (id: string, isPublic: boolean) => void;
 }
 
-export function DatingIdeaCard({ idea, onDelete, onEdit }: DatingIdeaCardProps) {
+export function DatingIdeaCard({ idea, onDelete, onEdit, onTogglePublic }: DatingIdeaCardProps) {
   const formatDate = (dateStr: string) => {
     const date = new Date(dateStr);
     return date.toLocaleDateString('de-DE', { 
@@ -72,6 +78,26 @@ export function DatingIdeaCard({ idea, onDelete, onEdit }: DatingIdeaCardProps) 
             </Badge>
           )}
         </div>
+
+        {onTogglePublic && (
+          <div className="flex items-center space-x-2 p-3 bg-muted/50 rounded-lg">
+            <Switch
+              id={`public-${idea.id}`}
+              checked={idea.is_public || false}
+              onCheckedChange={(checked) => onTogglePublic(idea.id, checked)}
+              disabled={!idea.latitude && idea.is_public}
+            />
+            <Label htmlFor={`public-${idea.id}`} className="text-sm flex items-center gap-2">
+              <Globe className="h-4 w-4" />
+              Als konkretes Date veröffentlichen
+            </Label>
+            {!idea.latitude && idea.is_public && (
+              <Badge variant="destructive" className="text-xs">
+                Ort erforderlich
+              </Badge>
+            )}
+          </div>
+        )}
 
         <div className="flex gap-2 mt-3">
           {idea.url && (

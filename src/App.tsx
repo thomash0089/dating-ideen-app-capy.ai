@@ -11,6 +11,7 @@ import Dashboard from "./pages/Dashboard";
 import AdminDashboard from "./pages/AdminDashboard";
 import Profile from "./pages/Profile";
 import CommunityDates from "./pages/CommunityDates";
+import UserProfile from "./pages/UserProfile";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -40,11 +41,16 @@ const App = () => (
                 <Profile />
               </ProtectedRoute>
             } />
-            <Route path="/community-dates" element={
-              <ProtectedRoute>
-                <CommunityDates />
-              </ProtectedRoute>
-            } />
+          <Route path="/community-dates" element={
+            <ProtectedRoute>
+              <CommunityDates />
+            </ProtectedRoute>
+          } />
+          <Route path="/profile/:userId" element={
+            <ProtectedRoute>
+              <UserProfile />
+            </ProtectedRoute>
+          } />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

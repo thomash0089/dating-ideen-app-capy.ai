@@ -1,13 +1,16 @@
-import { useState, useEffect, useRef } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { MapPin, Calendar, Users, Filter, Search } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
+import { useState, useRef, useEffect } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Slider } from "@/components/ui/slider";
+import { Badge } from "@/components/ui/badge";
+import { Calendar, Clock, MapPin, Search, Users, Filter } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
+import { CommunityDateCard, CommunityDate } from "@/components/CommunityDateCard";
+import { useToast } from "@/hooks/use-toast";
 
 interface GeocodeResult {
   lat: number;
@@ -16,25 +19,6 @@ interface GeocodeResult {
   country_code?: string;
 }
 
-interface CommunityDate {
-  id: string;
-  title: string;
-  description: string;
-  location: string;
-  latitude: number;
-  longitude: number;
-  category: string;
-  date_planned: string;
-  time_planned: string;
-  duration: string;
-  max_participants: number;
-  current_participants: number;
-  distance_km: number;
-  creator_name: string;
-  creator_age: number;
-  creator_gender: string;
-  creator_city: string;
-}
 
 const CATEGORIES = {
   romantic: '💕 Romantisch',
@@ -310,66 +294,8 @@ export function CommunityDatesSearch() {
           </h3>
         )}
 
-        {communityDates.map((dateItem) => (
-          <Card key={dateItem.id} className="hover:shadow-lg transition-shadow">
-            <CardContent className="p-6">
-              <div className="flex flex-col md:flex-row justify-between items-start gap-4">
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-2">
-                    <h3 className="text-xl font-semibold">{dateItem.title}</h3>
-                    <Badge variant="outline">
-                      {CATEGORIES[dateItem.category as keyof typeof CATEGORIES] || dateItem.category}
-                    </Badge>
-                  </div>
-                  
-                  <p className="text-muted-foreground mb-3">{dateItem.description}</p>
-                  
-                  <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
-                    <div className="flex items-center gap-1">
-                      <MapPin className="h-4 w-4" />
-                      <span>{dateItem.location}</span>
-                      <span className="text-xs">({dateItem.distance_km.toFixed(1)} km)</span>
-                    </div>
-                    
-                    {dateItem.date_planned && (
-                      <div className="flex items-center gap-1">
-                        <Calendar className="h-4 w-4" />
-                        <span>
-                          {new Date(dateItem.date_planned).toLocaleDateString('de-DE')}
-                          {dateItem.time_planned && ` um ${dateItem.time_planned}`}
-                        </span>
-                      </div>
-                    )}
-                    
-                    <div className="flex items-center gap-1">
-                      <Users className="h-4 w-4" />
-                      <span>{dateItem.current_participants}/{dateItem.max_participants} Teilnehmer</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="text-right">
-                  <div className="text-sm text-muted-foreground">
-                    Erstellt von: <span className="font-medium">{dateItem.creator_name}</span>
-                  </div>
-                  {dateItem.creator_age && (
-                    <div className="text-sm text-muted-foreground">
-                      {dateItem.creator_age} Jahre
-                    </div>
-                  )}
-                  {dateItem.creator_city && (
-                    <div className="text-sm text-muted-foreground">
-                      aus {dateItem.creator_city}
-                    </div>
-                  )}
-                  
-                  <Button className="mt-3" size="sm">
-                    Interesse zeigen
-                  </Button>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+        {communityDates.map((date) => (
+          <CommunityDateCard key={date.id} date={date} />
         ))}
 
         {!loading && communityDates.length === 0 && selectedLocation && (

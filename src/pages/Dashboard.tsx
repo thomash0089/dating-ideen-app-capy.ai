@@ -25,6 +25,8 @@ interface DatingIdea {
   latitude?: number | null;
   longitude?: number | null;
   created_at: string;
+  is_public?: boolean;
+  max_participants?: number;
 }
 
 export default function Dashboard() {
@@ -200,6 +202,48 @@ export default function Dashboard() {
     setShowForm(false);
   };
 
+  const handleTogglePublic = async (ideaId: string, isPublic: boolean) => {
+    if (!user) return;
+
+    try {
+      // Validate location is required for public dates
+      if (isPublic) {
+        const idea = ideas.find(i => i.id === ideaId);
+        if (!idea?.latitude) {
+          toast({
+            title: "Ort erforderlich",
+            description: "Für die Veröffentlichung muss ein Ort mit Koordinaten angegeben werden.",
+            variant: "destructive"
+          });
+          return;
+        }
+      }
+
+      const { error } = await supabase
+        .from('datingideen_ideas')
+        .update({ is_public: isPublic })
+        .eq('id', ideaId)
+        .eq('user_id', user.id);
+
+      if (error) throw error;
+
+      toast({
+        title: isPublic ? "Date veröffentlicht!" : "Veröffentlichung beendet",
+        description: isPublic ? 
+          "Dein Date ist jetzt für andere Nutzer sichtbar." :
+          "Dein Date ist jetzt wieder privat.",
+      });
+
+      fetchIdeas();
+    } catch (error: any) {
+      toast({
+        title: "Fehler",
+        description: error.message || "Etwas ist schief gelaufen.",
+        variant: "destructive",
+      });
+    }
+  };
+
   const handleLogout = async () => {
     try {
       await signOut();
@@ -361,14 +405,15 @@ export default function Dashboard() {
                     )}
                   </div>
                   
-                  {ideas.map((idea) => (
-                    <DatingIdeaCard
-                      key={idea.id}
-                      idea={idea}
-                      onDelete={handleDeleteIdea}
-                      onEdit={handleEditIdea}
-                    />
-                  ))}
+                      {ideas.map((idea) => (
+                        <DatingIdeaCard 
+                          key={idea.id} 
+                          idea={idea} 
+                          onDelete={handleDeleteIdea}
+                          onEdit={handleEditIdea}
+                          onTogglePublic={handleTogglePublic}
+                        />
+                      ))}
                 </>
               )}
             </div>

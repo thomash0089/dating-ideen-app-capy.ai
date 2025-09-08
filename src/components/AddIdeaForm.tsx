@@ -84,7 +84,9 @@ export function AddIdeaForm({ onSubmit, onCancel, editingIdea, isEditing = false
     if (!formData.description.trim()) {
       newErrors.description = 'Beschreibung ist erforderlich';
     }
-    // Location is now optional with ** marking
+    if (formData.is_public && !formData.location.trim()) {
+      newErrors.location = 'Ort ist erforderlich um das Date zu veröffentlichen';
+    }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -264,7 +266,7 @@ export function AddIdeaForm({ onSubmit, onCancel, editingIdea, isEditing = false
 
             <div className="space-y-2">
               <Label htmlFor="location" className="text-sm font-medium">
-                Ort/Stadt/Adresse **
+                Ort/Stadt/Adresse {formData.is_public ? '*' : '**'}
               </Label>
               <div className="relative">
                 <Input
@@ -359,10 +361,10 @@ export function AddIdeaForm({ onSubmit, onCancel, editingIdea, isEditing = false
                 <Switch
                   id="is-public"
                   checked={formData.is_public}
-                  onCheckedChange={(checked) => handleChange('is_public', checked.toString())}
+                  onCheckedChange={(checked) => handleChange('is_public', checked)}
                 />
                 <Label htmlFor="is-public" className="text-sm">
-                  In Community teilen (andere Nutzer können dieses Date sehen)
+                  Als konkretes Date veröffentlichen (andere Nutzer können teilnehmen)
                 </Label>
               </div>
 
@@ -387,6 +389,10 @@ export function AddIdeaForm({ onSubmit, onCancel, editingIdea, isEditing = false
                 </div>
               )}
             </div>
+
+            <p className="text-xs text-muted-foreground mt-2">
+              * Erforderlich für die Veröffentlichung | ** Optional für private Ideen
+            </p>
 
             <div className="flex gap-3 pt-4">
               <Button
