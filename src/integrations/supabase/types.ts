@@ -7,8 +7,6 @@ export type Json =
   | Json[]
 
 export type Database = {
-  // Allows to automatically instantiate createClient with right options
-  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
     PostgrestVersion: "13.0.4"
   }
@@ -56,7 +54,7 @@ export type Database = {
           created_at?: string
           current_participants?: number | null
           date_planned?: string | null
-          description?: string
+          description?: string | null
           duration?: string | null
           general_location_info?: string | null
           id?: string
@@ -107,7 +105,7 @@ export type Database = {
         Update: {
           category?: string | null
           created_at?: string
-          description?: string
+          description?: string | null
           difficulty_level?: string | null
           duration?: string | null
           estimated_cost?: string | null
@@ -229,6 +227,246 @@ export type Database = {
         }
         Relationships: []
       }
+      date_ideen_events: {
+        Row: {
+          id: string
+          organizer_user_id: string
+          title: string
+          description: string | null
+          address: string | null
+          place_lat: number | null
+          place_lng: number | null
+          radius_km: number
+          start_at: string
+          end_at: string
+          max_participants: number
+          gender_policy: Database["public"]["Enums"]["date_ideen_gender_policy"]
+          age_min: number
+          age_max: number
+          interests_filter: string[] | null
+          deposit_cents: number
+          currency: string
+          survey_sent_at: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          organizer_user_id: string
+          title: string
+          description?: string | null
+          address?: string | null
+          place_lat?: number | null
+          place_lng?: number | null
+          radius_km?: number
+          start_at: string
+          end_at: string
+          max_participants?: number
+          gender_policy?: Database["public"]["Enums"]["date_ideen_gender_policy"]
+          age_min?: number
+          age_max?: number
+          interests_filter?: string[] | null
+          deposit_cents?: number
+          currency?: string
+          survey_sent_at?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          organizer_user_id?: string
+          title?: string
+          description?: string | null
+          address?: string | null
+          place_lat?: number | null
+          place_lng?: number | null
+          radius_km?: number
+          start_at?: string
+          end_at?: string
+          max_participants?: number
+          gender_policy?: Database["public"]["Enums"]["date_ideen_gender_policy"]
+          age_min?: number
+          age_max?: number
+          interests_filter?: string[] | null
+          deposit_cents?: number
+          currency?: string
+          survey_sent_at?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      date_ideen_event_participants: {
+        Row: {
+          id: string
+          event_id: string
+          user_id: string
+          status: Database["public"]["Enums"]["date_ideen_participant_status"]
+          joined_at: string
+          deposit_amount_cents: number | null
+          payment_id: string | null
+          deposit_status: Database["public"]["Enums"]["date_ideen_payment_status"] | null
+          refund_status: Database["public"]["Enums"]["date_ideen_refund_status"]
+        }
+        Insert: {
+          id?: string
+          event_id: string
+          user_id: string
+          status?: Database["public"]["Enums"]["date_ideen_participant_status"]
+          joined_at?: string
+          deposit_amount_cents?: number | null
+          payment_id?: string | null
+          deposit_status?: Database["public"]["Enums"]["date_ideen_payment_status"] | null
+          refund_status?: Database["public"]["Enums"]["date_ideen_refund_status"]
+        }
+        Update: {
+          id?: string
+          event_id?: string
+          user_id?: string
+          status?: Database["public"]["Enums"]["date_ideen_participant_status"]
+          joined_at?: string
+          deposit_amount_cents?: number | null
+          payment_id?: string | null
+          deposit_status?: Database["public"]["Enums"]["date_ideen_payment_status"] | null
+          refund_status?: Database["public"]["Enums"]["date_ideen_refund_status"]
+        }
+        Relationships: []
+      }
+      date_ideen_event_invitations: {
+        Row: {
+          id: string
+          event_id: string
+          inviter_id: string
+          invitee_user_id: string
+          token: string
+          status: string
+          expires_at: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          event_id: string
+          inviter_id: string
+          invitee_user_id: string
+          token: string
+          status?: string
+          expires_at: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          event_id?: string
+          inviter_id?: string
+          invitee_user_id?: string
+          token?: string
+          status?: string
+          expires_at?: string
+          created_at?: string
+        }
+        Relationships: []
+      }
+      date_ideen_payments: {
+        Row: {
+          id: string
+          event_id: string
+          user_id: string
+          stripe_payment_intent_id: string
+          amount_cents: number
+          currency: string
+          fee_cents: number | null
+          status: Database["public"]["Enums"]["date_ideen_payment_status"]
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          event_id: string
+          user_id: string
+          stripe_payment_intent_id: string
+          amount_cents: number
+          currency: string
+          fee_cents?: number | null
+          status: Database["public"]["Enums"]["date_ideen_payment_status"]
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          event_id?: string
+          user_id?: string
+          stripe_payment_intent_id?: string
+          amount_cents?: number
+          currency?: string
+          fee_cents?: number | null
+          status?: Database["public"]["Enums"]["date_ideen_payment_status"]
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      date_ideen_feedback: {
+        Row: {
+          id: string
+          event_id: string
+          reviewer_user_id: string
+          rating: number
+          would_meet_again: boolean | null
+          not_good: boolean | null
+          comments: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          event_id: string
+          reviewer_user_id: string
+          rating: number
+          would_meet_again?: boolean | null
+          not_good?: boolean | null
+          comments?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          event_id?: string
+          reviewer_user_id?: string
+          rating?: number
+          would_meet_again?: boolean | null
+          not_good?: boolean | null
+          comments?: string | null
+          created_at?: string
+        }
+        Relationships: []
+      }
+      date_ideen_notifications: {
+        Row: {
+          id: string
+          user_id: string
+          title: string
+          body: string | null
+          link: string | null
+          read_at: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          title: string
+          body?: string | null
+          link?: string | null
+          read_at?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          title?: string
+          body?: string | null
+          link?: string | null
+          read_at?: string | null
+          created_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -277,6 +515,29 @@ export type Database = {
           title: string
         }[]
       }
+      date_ideen_search_events_by_radius: {
+        Args: {
+          center_lat: number
+          center_lng: number
+          radius_km: number
+          start_time?: string
+          end_time?: string
+          gender_policy_filter?: Database["public"]["Enums"]["date_ideen_gender_policy"]
+          age_min?: number
+          age_max?: number
+        }
+        Returns: {
+          id: string
+          title: string
+          description: string
+          address: string
+          start_at: string
+          end_at: string
+          distance_km: number
+          max_participants: number
+          organizer_user_id: string
+        }[]
+      }
     }
     Enums: {
       datingideen_app_role: "user" | "admin"
@@ -294,6 +555,10 @@ export type Database = {
       datingideen_gender: "male" | "female" | "other"
       datingideen_gender_search: "male" | "female" | "both"
       datingideen_relationship_status: "single" | "in_partnership"
+      date_ideen_gender_policy: "mixed" | "female_only" | "male_only" | "balanced"
+      date_ideen_participant_status: "invited" | "requested" | "confirmed" | "attended" | "no_show" | "cancelled"
+      date_ideen_payment_status: "authorized" | "requires_action" | "succeeded" | "failed" | "canceled" | "refunded" | "partial_refund"
+      date_ideen_refund_status: "pending" | "full_refund" | "partial_refund" | "no_refund"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -437,6 +702,10 @@ export const Constants = {
       datingideen_gender: ["male", "female", "other"],
       datingideen_gender_search: ["male", "female", "both"],
       datingideen_relationship_status: ["single", "in_partnership"],
+      date_ideen_gender_policy: ["mixed", "female_only", "male_only", "balanced"],
+      date_ideen_participant_status: ["invited", "requested", "confirmed", "attended", "no_show", "cancelled"],
+      date_ideen_payment_status: ["authorized", "requires_action", "succeeded", "failed", "canceled", "refunded", "partial_refund"],
+      date_ideen_refund_status: ["pending", "full_refund", "partial_refund", "no_refund"],
     },
   },
 } as const

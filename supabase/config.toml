@@ -2,3 +2,15 @@ project_id = "owhgsndeztyqirihpjtw"
 
 [functions.geocode]
 verify_jwt = false
+
+[functions.payments]
+verify_jwt = true
+
+[functions.stripe_webhook]
+verify_jwt = false
+
+[functions.post_date_survey]
+verify_jwt = false
+
+[functions.refunds]
+verify_jwt = false
