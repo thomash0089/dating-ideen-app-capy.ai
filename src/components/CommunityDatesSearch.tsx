@@ -57,10 +57,10 @@ export function CommunityDatesSearch() {
   const [radius, setRadius] = useState(50);
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
-  const [category, setCategory] = useState('');
+  const [category, setCategory] = useState('all');
   const [minAge, setMinAge] = useState('');
   const [maxAge, setMaxAge] = useState('');
-  const [gender, setGender] = useState('');
+  const [gender, setGender] = useState('all');
   const [communityDates, setCommunityDates] = useState<CommunityDate[]>([]);
   const [loading, setLoading] = useState(false);
   const searchTimeoutRef = useRef<NodeJS.Timeout>();
@@ -131,10 +131,10 @@ export function CommunityDatesSearch() {
         radius_km: radius,
         start_date: startDate || null,
         end_date: endDate || null,
-        idea_category: (category as any) || null,
+        idea_category: category === 'all' ? null : (category as any),
         min_age: minAge ? parseInt(minAge) : null,
         max_age: maxAge ? parseInt(maxAge) : null,
-        gender_filter: (gender as any) || null
+        gender_filter: gender === 'all' ? null : (gender as any)
       });
 
       if (error) throw error;
@@ -236,17 +236,17 @@ export function CommunityDatesSearch() {
             {/* Category */}
             <div className="space-y-2">
               <Label>Kategorie</Label>
-              <Select value={category} onValueChange={setCategory}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Alle Kategorien" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="">Alle Kategorien</SelectItem>
-                  {Object.entries(CATEGORIES).map(([key, label]) => (
-                    <SelectItem key={key} value={key}>{label}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+            <Select value={category} onValueChange={setCategory}>
+              <SelectTrigger>
+                <SelectValue placeholder="Alle Kategorien" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Alle Kategorien</SelectItem>
+                {Object.entries(CATEGORIES).map(([key, label]) => (
+                  <SelectItem key={key} value={key}>{label}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
             </div>
 
             {/* Age Range */}
@@ -275,17 +275,17 @@ export function CommunityDatesSearch() {
             {/* Gender */}
             <div className="space-y-2">
               <Label>Geschlecht</Label>
-              <Select value={gender} onValueChange={setGender}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Alle" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="">Alle</SelectItem>
-                  <SelectItem value="male">Männlich</SelectItem>
-                  <SelectItem value="female">Weiblich</SelectItem>
-                  <SelectItem value="diverse">Divers</SelectItem>
-                </SelectContent>
-              </Select>
+            <Select value={gender} onValueChange={setGender}>
+              <SelectTrigger>
+                <SelectValue placeholder="Alle" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Alle</SelectItem>
+                <SelectItem value="male">Männlich</SelectItem>
+                <SelectItem value="female">Weiblich</SelectItem>
+                <SelectItem value="diverse">Divers</SelectItem>
+              </SelectContent>
+            </Select>
             </div>
           </div>
 
