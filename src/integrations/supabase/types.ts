@@ -16,13 +16,17 @@ export type Database = {
     Tables: {
       datingideen_ideas: {
         Row: {
+          category: Database["public"]["Enums"]["datingideen_category"] | null
           created_at: string
+          current_participants: number | null
           date_planned: string | null
           description: string
           duration: string | null
           general_location_info: string | null
           id: string
+          is_public: boolean | null
           location: string
+          max_participants: number | null
           time_planned: string | null
           title: string
           updated_at: string
@@ -30,13 +34,17 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          category?: Database["public"]["Enums"]["datingideen_category"] | null
           created_at?: string
+          current_participants?: number | null
           date_planned?: string | null
           description: string
           duration?: string | null
           general_location_info?: string | null
           id?: string
+          is_public?: boolean | null
           location: string
+          max_participants?: number | null
           time_planned?: string | null
           title: string
           updated_at?: string
@@ -44,13 +52,17 @@ export type Database = {
           user_id: string
         }
         Update: {
+          category?: Database["public"]["Enums"]["datingideen_category"] | null
           created_at?: string
+          current_participants?: number | null
           date_planned?: string | null
           description?: string
           duration?: string | null
           general_location_info?: string | null
           id?: string
+          is_public?: boolean | null
           location?: string
+          max_participants?: number | null
           time_planned?: string | null
           title?: string
           updated_at?: string
@@ -233,9 +245,52 @@ export type Database = {
         }
         Returns: boolean
       }
+      search_dates_by_radius: {
+        Args: {
+          center_lat: number
+          center_lng: number
+          end_date?: string
+          gender_filter?: Database["public"]["Enums"]["datingideen_gender"]
+          idea_category?: Database["public"]["Enums"]["datingideen_category"]
+          max_age?: number
+          min_age?: number
+          radius_km: number
+          start_date?: string
+        }
+        Returns: {
+          category: Database["public"]["Enums"]["datingideen_category"]
+          creator_age: number
+          creator_city: string
+          creator_gender: Database["public"]["Enums"]["datingideen_gender"]
+          creator_name: string
+          current_participants: number
+          date_planned: string
+          description: string
+          distance_km: number
+          duration: string
+          id: string
+          latitude: number
+          location: string
+          longitude: number
+          max_participants: number
+          time_planned: string
+          title: string
+        }[]
+      }
     }
     Enums: {
       datingideen_app_role: "user" | "admin"
+      datingideen_category:
+        | "romantic"
+        | "adventure"
+        | "cultural"
+        | "outdoor"
+        | "indoor"
+        | "food_drinks"
+        | "sports"
+        | "creative"
+        | "relaxation"
+        | "entertainment"
       datingideen_gender: "male" | "female" | "other"
       datingideen_gender_search: "male" | "female" | "both"
       datingideen_relationship_status: "single" | "in_partnership"
@@ -367,6 +422,18 @@ export const Constants = {
   public: {
     Enums: {
       datingideen_app_role: ["user", "admin"],
+      datingideen_category: [
+        "romantic",
+        "adventure",
+        "cultural",
+        "outdoor",
+        "indoor",
+        "food_drinks",
+        "sports",
+        "creative",
+        "relaxation",
+        "entertainment",
+      ],
       datingideen_gender: ["male", "female", "other"],
       datingideen_gender_search: ["male", "female", "both"],
       datingideen_relationship_status: ["single", "in_partnership"],

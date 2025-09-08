@@ -291,6 +291,20 @@ export default function Dashboard() {
         )}
 
         {/* Tabs for Ideas and Inspirations */}
+        {/* Quick Action Button for Community Dates */}
+        <div className="mb-6">
+          <Link to="/community-dates">
+            <Button 
+              variant="outline" 
+              className="w-full md:w-auto bg-gradient-to-r from-emerald-50 to-teal-50 hover:from-emerald-100 hover:to-teal-100 border-emerald-200 text-emerald-700"
+            >
+              <span className="mr-2">🌍</span>
+              Konkrete Dates in der Community entdecken
+            </Button>
+          </Link>
+        </div>
+
+        {/* Tabs for Ideas and Inspirations */}
         <Tabs defaultValue="ideas" className="w-full">
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="ideas">Meine Ideen</TabsTrigger>

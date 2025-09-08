@@ -4,6 +4,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
 import { X, Heart, Sparkles } from "lucide-react";
 import { DurationSelector } from "@/components/DurationSelector";
 import { supabase } from "@/integrations/supabase/client";
@@ -19,7 +21,23 @@ interface DatingIdea {
   time_planned?: string | null;
   latitude?: number | null;
   longitude?: number | null;
+  category?: string;
+  is_public?: boolean;
+  max_participants?: number;
 }
+
+const CATEGORIES = {
+  romantic: '💕 Romantisch',
+  adventure: '🏔️ Abenteuer',
+  cultural: '🎭 Kultur',
+  outdoor: '🌳 Outdoor',
+  indoor: '🏠 Indoor',
+  food_drinks: '🍽️ Essen & Trinken',
+  sports: '⚽ Sport',
+  creative: '🎨 Kreativ',
+  relaxation: '🧘 Entspannung',
+  entertainment: '🎪 Entertainment'
+};
 
 interface GeocodeResult {
   lat: number;
@@ -47,6 +65,9 @@ export function AddIdeaForm({ onSubmit, onCancel, editingIdea, isEditing = false
     time_planned: editingIdea?.time_planned || '',
     latitude: null as number | null,
     longitude: null as number | null,
+    category: (editingIdea as any)?.category || 'romantic',
+    is_public: (editingIdea as any)?.is_public || false,
+    max_participants: (editingIdea as any)?.max_participants || 2,
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [searchResults, setSearchResults] = useState<GeocodeResult[]>([]);
@@ -152,6 +173,9 @@ export function AddIdeaForm({ onSubmit, onCancel, editingIdea, isEditing = false
           time_planned: '',
           latitude: null,
           longitude: null,
+          category: 'romantic',
+          is_public: false,
+          max_participants: 2,
         });
       } catch (error) {
         // Error handling is done in the parent component
@@ -161,8 +185,13 @@ export function AddIdeaForm({ onSubmit, onCancel, editingIdea, isEditing = false
     }
   };
 
-  const handleChange = (field: string, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+  const handleChange = (field: string, value: string | boolean) => {
+    setFormData(prev => ({ 
+      ...prev, 
+      [field]: field === 'is_public' ? value : 
+               field === 'max_participants' ? parseInt(value as string) : 
+               value 
+    }));
     if (errors[field]) {
       setErrors(prev => ({ ...prev, [field]: '' }));
     }
@@ -282,6 +311,20 @@ export function AddIdeaForm({ onSubmit, onCancel, editingIdea, isEditing = false
               onChange={(value) => handleChange('duration', value)}
             />
 
+            <div className="space-y-2">
+              <Label htmlFor="category">Kategorie</Label>
+              <Select value={formData.category} onValueChange={(value) => handleChange('category', value)}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {Object.entries(CATEGORIES).map(([key, label]) => (
+                    <SelectItem key={key} value={key}>{label}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-2">
                 <Label htmlFor="date" className="text-sm font-medium">
@@ -306,6 +349,43 @@ export function AddIdeaForm({ onSubmit, onCancel, editingIdea, isEditing = false
                   onChange={(e) => handleChange('time_planned', e.target.value)}
                 />
               </div>
+            </div>
+
+            {/* Community Settings */}
+            <div className="space-y-4 p-4 bg-gradient-to-r from-rose-50 to-pink-50 rounded-lg border border-rose-200">
+              <h4 className="font-medium text-foreground">Community Einstellungen</h4>
+              
+              <div className="flex items-center space-x-2">
+                <Switch
+                  id="is-public"
+                  checked={formData.is_public}
+                  onCheckedChange={(checked) => handleChange('is_public', checked.toString())}
+                />
+                <Label htmlFor="is-public" className="text-sm">
+                  In Community teilen (andere Nutzer können dieses Date sehen)
+                </Label>
+              </div>
+
+              {formData.is_public && (
+                <div className="space-y-2">
+                  <Label htmlFor="max-participants">Max. Teilnehmer</Label>
+                  <Select 
+                    value={formData.max_participants.toString()} 
+                    onValueChange={(value) => handleChange('max_participants', value)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="2">2 Personen</SelectItem>
+                      <SelectItem value="4">4 Personen</SelectItem>
+                      <SelectItem value="6">6 Personen</SelectItem>
+                      <SelectItem value="8">8 Personen</SelectItem>
+                      <SelectItem value="10">10+ Personen</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
             </div>
 
             <div className="flex gap-3 pt-4">
