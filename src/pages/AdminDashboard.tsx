@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import AdminMessages from '@/pages/admin/AdminMessages';
+import { AdminBroadcastPanel } from '@/modules/inapp-messaging';
 import AdminSettings from '@/pages/admin/AdminSettings';
 import { Badge } from '@/components/ui/badge';
 import { toast } from '@/hooks/use-toast';
@@ -591,7 +591,7 @@ export default function AdminDashboard() {
                 <CardTitle>In-App Nachricht an Nutzer senden</CardTitle>
               </CardHeader>
               <CardContent>
-                <AdminMessages />
+                <AdminBroadcastPanel />
               </CardContent>
             </Card>
           </TabsContent>

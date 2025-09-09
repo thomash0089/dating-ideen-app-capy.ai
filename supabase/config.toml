@@ -17,3 +17,6 @@ verify_jwt = false
 
 [functions.seed]
 verify_jwt = true
+
+[functions.admin_broadcast]
+verify_jwt = true
