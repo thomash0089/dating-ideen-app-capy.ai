@@ -13,6 +13,11 @@ import Profile from "./pages/Profile";
 import CommunityDates from "./pages/CommunityDates";
 import UserProfile from "./pages/UserProfile";
 import NotFound from "./pages/NotFound";
+import Events from "./pages/Events";
+import EventCreate from "./pages/EventCreate";
+import EventDetail from "./pages/EventDetail";
+import EventSurvey from "./pages/EventSurvey";
+import Notifications from "./pages/Notifications";
 
 const queryClient = new QueryClient();
 
@@ -41,17 +46,41 @@ const App = () => (
                 <Profile />
               </ProtectedRoute>
             } />
-          <Route path="/community-dates" element={
-            <ProtectedRoute>
-              <CommunityDates />
-            </ProtectedRoute>
-          } />
-          <Route path="/profile/:userId" element={
-            <ProtectedRoute>
-              <UserProfile />
-            </ProtectedRoute>
-          } />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+            <Route path="/community-dates" element={
+              <ProtectedRoute>
+                <CommunityDates />
+              </ProtectedRoute>
+            } />
+            <Route path="/profile/:userId" element={
+              <ProtectedRoute>
+                <UserProfile />
+              </ProtectedRoute>
+            } />
+            <Route path="/events" element={
+              <ProtectedRoute>
+                <Events />
+              </ProtectedRoute>
+            } />
+            <Route path="/events/create" element={
+              <ProtectedRoute>
+                <EventCreate />
+              </ProtectedRoute>
+            } />
+            <Route path="/events/:id" element={
+              <ProtectedRoute>
+                <EventDetail />
+              </ProtectedRoute>
+            } />
+            <Route path="/events/:id/survey" element={
+              <ProtectedRoute>
+                <EventSurvey />
+              </ProtectedRoute>
+            } />
+            <Route path="/notifications" element={
+              <ProtectedRoute>
+                <Notifications />
+              </ProtectedRoute>
+            } />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
