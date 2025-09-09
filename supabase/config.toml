@@ -14,3 +14,6 @@ verify_jwt = false
 
 [functions.refunds]
 verify_jwt = false
+
+[functions.seed]
+verify_jwt = true
