@@ -21,11 +21,8 @@ jobs:
       - name: Supabase login
         run: supabase login --token "$SUPABASE_ACCESS_TOKEN"
 
-      - name: Link project
-        run: supabase link --project-ref "$SUPABASE_PROJECT_REF"
-
       - name: Push migrations to remote
-        run: supabase db push --linked --yes
+        run: supabase db push --project-ref "$SUPABASE_PROJECT_REF" --yes --debug
 
       - name: Summary
         run: echo "Migrations pushed to $SUPABASE_PROJECT_REF"
