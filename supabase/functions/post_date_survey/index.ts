@@ -5,15 +5,6 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
-async function sendEmail(to: string, subject: string, html: string) {
-  const apiKey = Deno.env.get('RESEND_API_KEY')
-  if (!apiKey) return
-  await fetch('https://api.resend.com/emails', {
-    method: 'POST',
-    headers: { 'Authorization': `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify({ from: 'no-reply@capy.ai', to, subject, html })
-  })
-}
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response(null, { headers: corsHeaders })
@@ -52,9 +43,6 @@ Deno.serve(async (req) => {
 
         for (const p of profiles || []) {
           await supabase.from('date_ideen_notifications').insert({ user_id: p.user_id, title: 'Wie war euer Date?', body: 'Bewerte dein Date und gib Feedback.', link: `/events/${ev.id}/survey` })
-          if (p.email) {
-            await sendEmail(p.email, 'Wie war euer Date?', `Bitte gib dein Feedback: <a href="${Deno.env.get('APP_BASE_URL') || ''}/events/${ev.id}/survey">Link</a>`)
-          }
         }
       }
 

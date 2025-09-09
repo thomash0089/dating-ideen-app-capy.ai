@@ -1,0 +1,46 @@
+name: Supabase Migrations Apply
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+    paths:
+      - 'supabase/migrations/**'
+      - '.github/workflows/supabase-migrations.yml'
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install psql client
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y postgresql-client
+
+      - name: Check Database URL
+        id: check_db
+        run: |
+          if [ -z "${{ secrets.SUPABASE_DB_URL }}" ]; then
+            echo "dburl=false" >> $GITHUB_OUTPUT
+          else
+            echo "dburl=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Apply migrations (SQL)
+        if: steps.check_db.outputs.dburl == 'true'
+        env:
+          DATABASE_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: |
+          set -e
+          for f in $(ls -1 supabase/migrations/*.sql | sort); do
+            echo "Applying $f"
+            psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f "$f"
+          done
+
+      - name: Missing DB URL notice
+        if: steps.check_db.outputs.dburl == 'false'
+        run: |
+          echo "SUPABASE_DB_URL secret is not set. Please add it in GitHub repo secrets to auto-apply migrations." && exit 0
