@@ -40,7 +40,7 @@ jobs:
           if [ -n "${{ secrets.STRIPE_SECRET_KEY }}" ]; then
             supabase secrets set --project-ref "$SUPABASE_PROJECT_REF" STRIPE_SECRET_KEY=${{ secrets.STRIPE_SECRET_KEY }}
           fi
-          supabase secrets set --project-ref "$SUPABASE_PROJECT_REF" SUPABASE_SERVICE_ROLE_KEY=${{ secrets.SUPABASE_SERVICE_ROLE_KEY }} APP_BASE_URL=${{ secrets.APP_BASE_URL }}
+          supabase secrets set --project-ref "$SUPABASE_PROJECT_REF" SERVICE_ROLE_KEY=${{ secrets.SUPABASE_SERVICE_ROLE_KEY }} APP_BASE_URL=${{ secrets.APP_BASE_URL }}
 
       - name: Deploy Edge Functions
         run: |

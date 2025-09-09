@@ -10,8 +10,8 @@ Deno.serve(async (req) => {
   try {
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!
     const anon = Deno.env.get('SUPABASE_ANON_KEY')!
-    const service = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
-    if (!service) return new Response(JSON.stringify({ error: 'Missing service role key' }), { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
+    const service = Deno.env.get('SERVICE_ROLE_KEY')
+    if (!service) return new Response(JSON.stringify({ error: 'Missing SERVICE_ROLE_KEY' }), { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } })
 
     const authed = createClient(supabaseUrl, anon, { global: { headers: { Authorization: req.headers.get('Authorization') || '' } } })
     const { data: { user } } = await authed.auth.getUser()
