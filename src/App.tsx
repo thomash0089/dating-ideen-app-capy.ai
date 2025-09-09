@@ -18,6 +18,7 @@ import EventCreate from "./pages/EventCreate";
 import EventDetail from "./pages/EventDetail";
 import EventSurvey from "./pages/EventSurvey";
 import Notifications from "./pages/Notifications";
+import Chat from "./pages/Chat";
 
 const queryClient = new QueryClient();
 
@@ -79,6 +80,11 @@ const App = () => (
             <Route path="/notifications" element={
               <ProtectedRoute>
                 <Notifications />
+              </ProtectedRoute>
+            } />
+            <Route path="/chat" element={
+              <ProtectedRoute>
+                <Chat />
               </ProtectedRoute>
             } />
             <Route path="*" element={<NotFound />} />
