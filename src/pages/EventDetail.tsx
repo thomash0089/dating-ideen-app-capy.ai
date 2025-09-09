@@ -30,8 +30,10 @@ export default function EventDetail() {
     }
   }
 
-  const onPaymentSuccess = () => {
+  const onPaymentSuccess = async () => {
     setClientSecret(null)
+    const { data: ps } = await supabase.from('date_ideen_event_participants').select('user_id, status').eq('event_id', id)
+    setParticipants(ps || [])
   }
 
   if (!event) return <div className="p-4">Laden...</div>
@@ -50,11 +52,17 @@ export default function EventDetail() {
             <div>Teilnehmer: {participants.length} / {event.max_participants}</div>
           </div>
           {!clientSecret && (
-            <div className="mt-4"><Button onClick={join}>Teilnehmen (Pfand {((event.deposit_cents||0)/100).toFixed(2)} {event.currency})</Button></div>
+            <div className="mt-4 flex gap-2">
+              <Button onClick={join}>Teilnehmen (Pfand {((event.deposit_cents||0)/100).toFixed(2)} {event.currency})</Button>
+              <Button variant="outline" onClick={async ()=>{
+                const { data: chatId } = await supabase.rpc('date_ideen_get_or_create_event_chat', { ev_id: event.id })
+                location.href = '/chat'
+              }}>Event-Chat öffnen</Button>
+            </div>
           )}
           {clientSecret && paymentId && (
             <div className="mt-4">
-              <DepositCheckout clientSecret={clientSecret} paymentId={paymentId} eventId={event.id} onSuccess={onPaymentSuccess} />
+              <DepositCheckout clientSecret={clientSecret} paymentId={paymentId} eventId={event.id} depositAmount={event.deposit_cents || 0} onSuccess={onPaymentSuccess} />
             </div>
           )}
         </CardContent>

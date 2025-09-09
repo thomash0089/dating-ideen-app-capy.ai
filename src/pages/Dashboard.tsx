@@ -288,6 +288,15 @@ export default function Dashboard() {
                 </Button>
               </Link>
             )}
+            <Link to="/chat">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-muted-foreground hover:text-foreground"
+              >
+                💬 Chat
+              </Button>
+            </Link>
             <Link to="/profile">
               <Button
                 variant="ghost"

@@ -7,6 +7,8 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import AdminMessages from '@/pages/admin/AdminMessages';
+import AdminSettings from '@/pages/admin/AdminSettings';
 import { Badge } from '@/components/ui/badge';
 import { toast } from '@/hooks/use-toast';
 import { Trash2, Plus, Settings, Upload, Download, LogOut, User } from 'lucide-react';
@@ -325,8 +327,9 @@ export default function AdminDashboard() {
       {/* Main Content */}
       <main className="max-w-6xl mx-auto px-4 py-6">
         <Tabs defaultValue="inspirations" className="w-full">
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="inspirations">Inspirationen verwalten</TabsTrigger>
+            <TabsTrigger value="messages">Nachrichten</TabsTrigger>
             <TabsTrigger value="import">Import/Export</TabsTrigger>
             <TabsTrigger value="settings">Einstellungen</TabsTrigger>
           </TabsList>
@@ -582,15 +585,24 @@ export default function AdminDashboard() {
             </div>
           </TabsContent>
           
+          <TabsContent value="messages" className="mt-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>In-App Nachricht an Nutzer senden</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <AdminMessages />
+              </CardContent>
+            </Card>
+          </TabsContent>
+
           <TabsContent value="settings" className="mt-6">
             <Card>
               <CardHeader>
                 <CardTitle>System Einstellungen</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-muted-foreground">
-                  Weitere Einstellungen folgen in kommenden Updates...
-                </p>
+                <AdminSettings />
               </CardContent>
             </Card>
           </TabsContent>
