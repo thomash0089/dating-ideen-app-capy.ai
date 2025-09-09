@@ -14,11 +14,6 @@ type Filters = {
   relationship_status?: 'single'|'in_partnership'
 }
 
-deno: {
-  permissions: {
-    env: true,
-  }
-}
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response(null, { headers: corsHeaders })
